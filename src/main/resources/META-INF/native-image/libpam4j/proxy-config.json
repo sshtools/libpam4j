@@ -1,0 +1,14 @@
+[
+  {
+    "interfaces":["com.sun.jna.platform.linux.LibC"]
+  },
+  {
+    "interfaces":["com.sun.jna.platform.linux.Udev"]
+  },
+  {
+    "interfaces":["org.jvnet.libpam.impl.LinuxCLibrary"]
+  },
+  {
+    "interfaces":["org.jvnet.libpam.impl.PAMLibrary"]
+  }
+]

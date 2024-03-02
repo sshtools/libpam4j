@@ -24,11 +24,10 @@
 
 package org.jvnet.libpam.impl;
 
-import com.sun.jna.Pointer;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import org.jvnet.libpam.impl.CLibrary.passwd;
+
+import com.sun.jna.Pointer;
+import com.sun.jna.Structure;
 
 /**
  * FreeeBSD
@@ -50,6 +49,8 @@ import org.jvnet.libpam.impl.CLibrary.passwd;
  * @author R. Tyler Croy
  */
 
+@Structure.FieldOrder({"pw_change", "pw_class", "pw_gecos",
+                "pw_dir", "pw_shell", "pw_expire", "pw_fields"})
 public class FreeBSDPasswd extends passwd {
     public FreeBSDPasswd() {
     }
@@ -94,12 +95,5 @@ public class FreeBSDPasswd extends passwd {
         return pw_shell;
     }
 
-    @Override
-    protected List getFieldOrder() {
-        List fieldOrder = new ArrayList(super.getFieldOrder());
-        fieldOrder.addAll(Arrays.asList("pw_change", "pw_class", "pw_gecos",
-                "pw_dir", "pw_shell", "pw_expire", "pw_fields"));
-        return fieldOrder;
-    }
 
 }

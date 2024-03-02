@@ -25,12 +25,10 @@
 
 package org.jvnet.libpam.impl;
 
-import com.sun.jna.Pointer;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 import org.jvnet.libpam.impl.CLibrary.passwd;
+
+import com.sun.jna.Pointer;
+import com.sun.jna.Structure.FieldOrder;
 
 /**
  * Solaris passwd
@@ -49,6 +47,8 @@ import org.jvnet.libpam.impl.CLibrary.passwd;
  *
  * @author Sebastian Sdorra
  */
+@FieldOrder({"pw_age", "pw_comment", "pw_gecos",
+                "pw_dir", "pw_shell"})
 public class SolarisPasswd extends passwd {
     public String pw_age;
 
@@ -82,12 +82,5 @@ public class SolarisPasswd extends passwd {
         return pw_shell;
     }
 
-    @Override
-    protected List getFieldOrder() {
-        List fieldOrder = new ArrayList(super.getFieldOrder());
-        fieldOrder.addAll(Arrays.asList("pw_age", "pw_comment", "pw_gecos",
-                "pw_dir", "pw_shell"));
-        return fieldOrder;
-    }
 
 }

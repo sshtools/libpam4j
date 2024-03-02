@@ -23,17 +23,17 @@
  */
 package org.jvnet.libpam.impl;
 
+import org.jvnet.libpam.PAMException;
+
+import com.sun.jna.Library;
+import com.sun.jna.Memory;
+import com.sun.jna.Native;
 import com.sun.jna.Platform;
 import com.sun.jna.Pointer;
-import com.sun.jna.Native;
-import com.sun.jna.Library;
 import com.sun.jna.Structure;
-import com.sun.jna.Memory;
+import com.sun.jna.Structure.FieldOrder;
 import com.sun.jna.ptr.IntByReference;
 import com.sun.jna.ptr.PointerByReference;
-import java.util.Arrays;
-import java.util.List;
-import org.jvnet.libpam.PAMException;
 
 /**
  * @author Kohsuke Kawaguchi
@@ -44,6 +44,7 @@ public interface CLibrary extends Library {
      * and my Mac OS X reveals that the structure of this field isn't very portable.
      * In particular, we cannot read the real name reliably.
      */
+	@FieldOrder({"pw_name", "pw_passwd", "pw_uid", "pw_gid"})
     public class passwd extends Structure {
 
         public passwd() {
@@ -77,8 +78,10 @@ public interface CLibrary extends Library {
             Pointer resultPointer = pbr.getValue();
             if (resultPointer == null) {
                 if(result == 0) {
+                	mem.close();
                     throw new PAMException("No user information is available");
                 } else {
+                	mem.close();
                     throw new PAMException("Failed to retrieve user information (Error: " + result + ")");
                 }
             }
@@ -126,18 +129,13 @@ public interface CLibrary extends Library {
             return null;
         }
 
-        protected List getFieldOrder() {
-            return Arrays.asList("pw_name", "pw_passwd", "pw_uid", "pw_gid");
-        }
     }
 
+    @Structure.FieldOrder("gr_name")
     public class group extends Structure {
         public String gr_name;
         // ... the rest of the field is not interesting for us
 
-        protected List getFieldOrder() {
-            return Arrays.asList("gr_name");
-        }
     }
 
     Pointer calloc(int count, int size);
@@ -168,15 +166,15 @@ public interface CLibrary extends Library {
     static class Instance {
         private static CLibrary init() {
             if (Platform.isMac() || Platform.isOpenBSD()) {
-                return (CLibrary) Native.loadLibrary("c", BSDCLibrary.class);
+                return Native.load("c", BSDCLibrary.class);
             } else if (Platform.isFreeBSD()) {
-                return (CLibrary) Native.loadLibrary("c", FreeBSDCLibrary.class);
+                return Native.load("c", FreeBSDCLibrary.class);
             } else if (Platform.isSolaris()) {
-                return (CLibrary) Native.loadLibrary("c", SolarisCLibrary.class);
+                return Native.load("c", SolarisCLibrary.class);
             } else if (Platform.isLinux()) {
-                return (CLibrary) Native.loadLibrary("c", LinuxCLibrary.class);
+                return Native.load("c", LinuxCLibrary.class);
             } else {
-                return (CLibrary) Native.loadLibrary("c", CLibrary.class);
+                return Native.load("c", CLibrary.class);
             }
         }
     }

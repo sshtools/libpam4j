@@ -24,11 +24,10 @@
 
 package org.jvnet.libpam.impl;
 
-import com.sun.jna.Pointer;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import org.jvnet.libpam.impl.CLibrary.passwd;
+
+import com.sun.jna.Pointer;
+import com.sun.jna.Structure;
 
 /**
  * Linux passwd
@@ -46,6 +45,7 @@ import org.jvnet.libpam.impl.CLibrary.passwd;
  *
  * @author Sebastian Sdorra
  */
+@Structure.FieldOrder({"pw_gecos", "pw_dir", "pw_shell"})
 public class LinuxPasswd extends passwd {
 
     public LinuxPasswd() {
@@ -79,11 +79,5 @@ public class LinuxPasswd extends passwd {
         return pw_shell;
     }
 
-    @Override
-    protected List getFieldOrder() {
-        List fieldOrder = new ArrayList(super.getFieldOrder());
-        fieldOrder.addAll(Arrays.asList("pw_gecos", "pw_dir", "pw_shell"));
-        return fieldOrder;
-    }
 
 }

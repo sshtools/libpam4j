@@ -23,16 +23,16 @@
  */
 package org.jvnet.libpam.impl;
 
+import static org.jvnet.libpam.impl.CLibrary.libc;
+
+import com.sun.jna.Callback;
 import com.sun.jna.Library;
+import com.sun.jna.Native;
+import com.sun.jna.Pointer;
 import com.sun.jna.PointerType;
 import com.sun.jna.Structure;
-import com.sun.jna.Pointer;
-import com.sun.jna.Native;
-import com.sun.jna.Callback;
+import com.sun.jna.Structure.FieldOrder;
 import com.sun.jna.ptr.PointerByReference;
-import java.util.Arrays;
-import java.util.List;
-import static org.jvnet.libpam.impl.CLibrary.libc;
 
 /**
  * libpam.so binding.
@@ -48,6 +48,7 @@ public interface PAMLibrary extends Library {
         public pam_handle_t(Pointer pointer) { super(pointer); }
     }
 
+    @FieldOrder({"msg_style", "msg"})
     class pam_message extends Structure {
         public int msg_style;
         public String msg;
@@ -60,11 +61,9 @@ public interface PAMLibrary extends Library {
             read();
         }
 
-        protected List getFieldOrder() {
-            return Arrays.asList("msg_style", "msg");
-        }
     }
 
+    @FieldOrder({"resp", "resp_retcode"})
     class pam_response extends Structure {
         /**
          * This is really a string, but this field needs to be malloc-ed by the conversation
@@ -95,13 +94,10 @@ public interface PAMLibrary extends Library {
             this.resp = libc.strdup(msg);
         }
 
-        protected List getFieldOrder() {
-            return Arrays.asList("resp", "resp_retcode");
-        }
-
         public static final int SIZE = new pam_response().size();
     }
 
+    @FieldOrder({"conv", "__"})
     class pam_conv extends Structure {
         public interface PamCallback extends Callback {
             /**
@@ -116,10 +112,6 @@ public interface PAMLibrary extends Library {
 
         public pam_conv(PamCallback conv) {
             this.conv = conv;
-        }
-
-        protected List getFieldOrder() {
-            return Arrays.asList("conv", "__");
         }
     }
 
@@ -144,5 +136,5 @@ public interface PAMLibrary extends Library {
     final int PAM_ERROR_MSG        = 3; /* Error message */
     final int PAM_TEXT_INFO        = 4; /* Textual information */
 
-    public static final PAMLibrary libpam = (PAMLibrary)Native.loadLibrary("pam",PAMLibrary.class);
+    public static final PAMLibrary libpam = Native.load("pam",PAMLibrary.class);
 }
